@@ -1,65 +1,129 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import Vapi from "@vapi-ai/web";
+
+// Fetching from env variables
+const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "";
+const assistantId = process.env.NEXT_PUBLIC_VAPI_AGENT_ID || "";
 
 export default function Home() {
+  const [status, setStatus] = useState<"idle" | "connecting" | "listening" | "stopped">("idle");
+  const vapiRef = useRef<Vapi | null>(null);
+
+  useEffect(() => {
+    // 1. Initialize Vapi instance
+    if (!vapiRef.current && publicKey) {
+      vapiRef.current = new Vapi(publicKey);
+
+      // 2. Set up Event Listeners
+      vapiRef.current.on("call-start", () => {
+        console.log("Call started");
+        setStatus("listening");
+      });
+
+      vapiRef.current.on("call-end", () => {
+        console.log("Call ended");
+        setStatus("stopped");
+      });
+
+      vapiRef.current.on("error", (error) => {
+        console.error("Vapi Error Event:", error);
+        setStatus("idle");
+      });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (vapiRef.current) {
+        vapiRef.current.stop();
+      }
+    };
+  }, []);
+
+  const startConversation = async () => {
+    if (!publicKey || !assistantId) {
+      console.error("Missing Keys! Check your .env.local");
+      alert("API Key or Assistant ID is missing. Check your .env.local and restart the server.");
+      return;
+    }
+
+    try {
+      setStatus("connecting");
+      // Use the object syntax for the latest SDK version
+      await vapiRef.current?.start(assistantId);
+    } catch (err) {
+      console.error("Failed to start Vapi call:", err);
+      setStatus("idle");
+    }
+  };
+
+  const stopConversation = () => {
+    vapiRef.current?.stop();
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-4 font-sans">
+      <div className="max-w-md w-full text-center border border-zinc-800 rounded-3xl p-10 bg-zinc-900/40 backdrop-blur-xl shadow-2xl">
+        
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-extrabold tracking-tight mb-2">
+            🎙️ DSA Assistant
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-zinc-500 text-sm">
+            Voice-activated AI Interviewer
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Visualizer Area */}
+        <div className="flex flex-col items-center justify-center h-32 mb-8">
+          {status === "listening" && (
+            <div className="flex gap-1 items-end h-10">
+              <div className="w-1 bg-green-500 animate-[bounce_1s_infinite_0.1s] h-8"></div>
+              <div className="w-1 bg-green-500 animate-[bounce_1s_infinite_0.2s] h-12"></div>
+              <div className="w-1 bg-green-500 animate-[bounce_1s_infinite_0.3s] h-6"></div>
+              <div className="w-1 bg-green-500 animate-[bounce_1s_infinite_0.4s] h-10"></div>
+            </div>
+          )}
+          
+          <div className="mt-4">
+            <span className={`px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest ${
+              status === 'listening' ? 'bg-green-500/10 text-green-400' :
+              status === 'connecting' ? 'bg-yellow-500/10 text-yellow-400' :
+              'bg-zinc-800 text-zinc-500'
+            }`}>
+              {status}
+            </span>
+          </div>
         </div>
-      </main>
-    </div>
+
+        {/* Buttons */}
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={startConversation}
+            disabled={status === "listening" || status === "connecting"}
+            className="w-full py-4 rounded-2xl bg-white text-black font-bold text-lg hover:bg-zinc-200 disabled:opacity-30 transition-all transform active:scale-95"
+          >
+            {status === "connecting" ? "Initializing..." : "Start Interview"}
+          </button>
+
+          <button
+            onClick={stopConversation}
+            disabled={status !== "listening"}
+            className="w-full py-4 rounded-2xl bg-zinc-800 text-zinc-400 font-semibold hover:bg-red-950/30 hover:text-red-500 border border-transparent hover:border-red-900/50 transition-all disabled:opacity-0"
+          >
+            End Session
+          </button>
+        </div>
+
+        {/* Meta Info */}
+        <div className="mt-10 pt-6 border-t border-zinc-800/50">
+          <p className="text-[10px] text-zinc-600 font-mono uppercase tracking-tighter">
+            Agent Status: {assistantId ? "Configured" : "Not Found"}
+          </p>
+        </div>
+      </div>
+    </main>
   );
 }
