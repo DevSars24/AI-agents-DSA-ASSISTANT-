@@ -1,152 +1,101 @@
+# 🎙️ AI Agents – DSA Voice Assistant
 
-# 🎙️ AI Agents – DSA Voice Assistant (Frontend)
+Welcome to the **AI Agents – DSA Voice Assistant**! This is a frontend-only **AI Voice Agent** application built with **Next.js** and the **Vapi Web SDK**, designed to provide an interactive, voice-driven AI experience.
 
-A frontend-only **AI Voice Agent** built using **Next.js** and **Vapi**, designed to help users interact with an AI assistant via voice.
-The project is structured to support **future enhancements like System Prompts and RAG (Retrieval-Augmented Generation)** directly inside Vapi — **no custom backend required**.
-
----
-
-## 🚀 Features
-
-* 🎤 Voice-based AI interaction using **Vapi Web SDK**
-* ⚡ Built with **Next.js (App Router)**
-* 🔐 Secure environment variable handling
-* 🧠 Future-ready for:
-
-  * Custom **System Prompts**
-  * **RAG** via file uploads in Vapi dashboard
-* ❌ No backend / server required
+The core goal of this project is to create an intelligent AI assistant (such as a DSA tutor, interviewer, or mentor) without needing any custom backend server. All the heavy lifting, including voice processing, AI reasoning, and future enhancements like Retrieval-Augmented Generation (RAG), happens directly through **Vapi**.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌟 What is this project?
 
-* **Next.js 14**
-* **React**
-* **TypeScript**
-* **Tailwind CSS**
-* **Vapi Web SDK**
+This project proves that you can build a powerful, voice-enabled AI application entirely on the frontend. 
 
----
-
-## 📁 Project Structure
-
-```txt
-frontend/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
-├── public/
-├── package.json
-├── next.config.ts
-├── tsconfig.json
-└── .env.local   (not committed)
-```
+### Key Capabilities
+- **🎤 Real-Time Voice Interaction:** Uses the Vapi Web SDK to allow users to talk to the AI and receive voice responses.
+- **⚡ Fast & Modern:** Built on Next.js 14, React, TypeScript, and Tailwind CSS.
+- **🌐 Zero Backend Infrastructure:** All AI processing is offloaded to Vapi. No databases or custom APIs to manage locally.
+- **🧠 Future-Proof Design:** Prepared to adopt Vapi's built-in advanced features like Custom System Prompts and RAG (document uploads) seamlessly.
 
 ---
 
-## ⚙️ Installation & Setup
+## 🔑 REQUIRED API KEYS
 
-### 1️⃣ Install dependencies
+To make this project work, you **MUST** provide credentials from Vapi. Since this runs in the browser, these keys must be securely provided in your environment variables.
+
+You will need **TWO** keys:
+
+1. **`NEXT_PUBLIC_VAPI_PUBLIC_KEY`**
+   - **What it is:** The public identifier to connect to your Vapi account.
+   - **Where to find it:** Log in to the [Vapi Dashboard](https://dashboard.vapi.ai) -> Navigate to **API Keys** -> Look for your "Public Key".
+
+2. **`NEXT_PUBLIC_VAPI_AGENT_ID`**
+   - **What it is:** The unique ID for the specific AI Agent you created.
+   - **Where to find it:** Navigate to **Agents** in the Vapi Dashboard -> Click on your desired Agent -> Copy its **Agent ID** from the top.
+
+> ⚠️ **Important:** Never use your Vapi *Private API Key* on the frontend. Only the Public Key and Agent ID are necessary.
+
+---
+
+## 🛠️ Installation & Setup Guide
+
+### 1️⃣ Clone and Install
+First, make sure you are in the `frontend` directory and install the necessary dependencies:
 
 ```bash
 cd frontend
 npm install
 ```
 
----
+### 2️⃣ Configure Environment Variables
+Inside the `frontend` directory, create a hidden file named `.env.local`:
 
-### 2️⃣ Environment Variables
-
-Create a file named **`.env.local`** inside `frontend/`
-
-```env
-NEXT_PUBLIC_VAPI_PUBLIC_KEY=pk_your_public_key_here
-NEXT_PUBLIC_VAPI_AGENT_ID=ag_your_agent_id_here
+```bash
+# In the frontend/ directory
+touch .env.local
 ```
 
-🔑 **Where to get these?**
+Add your Vapi keys to this `.env.local` file exactly like this:
 
-* **Public Key** → Vapi Dashboard → API Keys
-* **Agent ID** → Vapi Dashboard → Agents → Select Agent
+```env
+NEXT_PUBLIC_VAPI_PUBLIC_KEY=pk_your_actual_public_key_here
+NEXT_PUBLIC_VAPI_AGENT_ID=ag_your_actual_agent_id_here
+```
 
-> ⚠️ Only variables prefixed with `NEXT_PUBLIC_` are accessible in the browser.
-
----
-
-### 3️⃣ Run the app
+### 3️⃣ Start the Development Server
+Once your keys are securely set up, launch the application:
 
 ```bash
 npm run dev
 ```
 
-Open 👉 `http://localhost:3000`
+Open your browser and navigate to 👉 `http://localhost:3000`
 
 ---
 
-## 🎙️ How It Works
+## 🎙️ How to Use the App
 
-* The frontend initializes the **Vapi client** using the public key
-* Clicking **Start Talking** begins a voice session
-* Clicking **Stop Conversation** ends the call
-* All AI logic runs via **Vapi’s hosted agent**
-
----
-
-## 🧠 Future Enhancements (Planned)
-
-These will be handled **directly inside Vapi**, not via backend code:
-
-### 🔹 System Prompt
-
-* Define agent behavior (DSA tutor, interviewer, mentor, etc.)
-* Control tone, depth, and response style
-
-### 🔹 RAG (Retrieval-Augmented Generation)
-
-* Upload PDFs / docs / notes in Vapi
-* Agent answers using your custom knowledge base
-* Ideal for:
-
-  * DSA notes
-  * Interview prep material
-  * Company-specific questions
-
-### 🔹 UI Improvements
-
-* Audio waveform visualization
-* Agent status (thinking / responding)
-* File upload UI (optional)
+1. Ensure your browser microphone permissions are granted when prompted.
+2. Click the **Start Talking** button on the interface.
+3. Begin speaking to the AI assistant. It will process your voice via Vapi and respond naturally.
+4. Click **Stop Conversation** when you are finished.
 
 ---
 
-## 🚫 What This Project Does NOT Use
+## 🚀 Future Enhancements (Handled via Vapi)
 
-* ❌ No custom backend
-* ❌ No database
-* ❌ No server-side APIs
+The beauty of this architecture is that all complex AI upgrades happen in the **Vapi Dashboard**, completely untouched by backend code:
 
-All intelligence is handled by **Vapi agents**.
-
----
-
-## 🔒 Security Notes
-
-* `.env.local` is ignored by Git
-* Only public keys are used on frontend
-* Sensitive logic stays inside Vapi
+- 🔹 **System Prompts:** Customize the personality of the agent (e.g., configuring it specifically as a tough DSA interviewer or a patient tutor).
+- 🔹 **RAG (Retrieval-Augmented Generation):** Upload your PDFs, specific DSA notes, or interview prep materials directly into Vapi. The agent will read these resources and answer using your custom knowledge base.
+- 🔹 **UI Improvements (Frontend):** Potential additions to the frontend include audio waveform visualization, better agent state indicators (thinking/speaking), and integrated file upload views.
 
 ---
 
-## 📌 Deployment
+## 🛡️ Security & Deployment
 
-This project can be deployed easily on:
+- **No Secrets Leaking:** The `.env.local` file is automatically ignored by Git (already configured in `.gitignore`). 
+- **Easy Deployment:** You can effortlessly deploy this project to platforms like [Vercel](https://vercel.com/) or [Netlify](https://netlify.com/). Just make sure to add `NEXT_PUBLIC_VAPI_PUBLIC_KEY` and `NEXT_PUBLIC_VAPI_AGENT_ID` into the Environment Variables section of your deployment dashboard!
 
-* **Vercel**
-* **Netlify**
-
-Just remember to add the same environment variables in the deployment dashboard.
 
 ---
 
